@@ -56,7 +56,7 @@ The honest version matters here, because the loose version ("a QR is one dot fro
 
 Both are measured, not asserted. The numbers come straight out of `qr_domain_flip.py --check`, which decodes four symbols for every claim: the clean code, the printed boundary, the boundary after the one flip, and a stock code with that same module flipped (the negative control, which must stay on the real host).
 
-### google.com, add ink
+### google.com, remove ink
 
 `https://google.com` is 18 bytes. A default generator emits version 2, level M. Its same-length neighbour `googlg.com` is 17 symbols and 54 modules away on a clean code. The boundary symbol closes all but one of those.
 
@@ -67,7 +67,7 @@ Both are measured, not asserted. The numbers come straight out of `qr_domain_fli
 | Symbol distance, radius | 17 symbols, radius 8 |
 | User module | `(15, 15)`, host character 13 |
 | Preloaded symbols | 8 |
-| Flip | add ink (darken) |
+| Flip | remove ink (lighten) |
 
 <div align="center">
 
@@ -78,22 +78,27 @@ Both are measured, not asserted. The numbers come straight out of `qr_domain_fli
 
 </div>
 
-### kaveh.org, remove ink
+### kaveh.org, a different TLD
 
-`https://kaveh.org` is 17 bytes, also version 2, level M. Here the one flip goes the other way: a square that is inked on the boundary symbol is scraped off, and the code moves to the neighbour.
+`https://kaveh.org` is 17 bytes, version 2, level M. The cheap neighbour here is not a misspelling of the name. It is a different, real top-level domain. `kaveh.org` and `kaveh.ong` (`.ong` is the registry for non-profits) are two squares of ink apart.
 
 | | value |
 |---|---|
-| From, to | `https://kaveh.org` -> `https://kaveh.o3g` |
+| From, to | `https://kaveh.org` -> `https://kaveh.ong` |
 | Version, level, mask | 2-M, mask 0, 1 block |
-| Symbol distance, radius | 17 symbols, radius 8 |
-| User module | `(9, 16)`, host character 15 |
+| Symbol distance, radius | 18 symbols, radius 8 |
+| User modules | 2, at `(8, 16)` and `(13, 2)` |
 | Preloaded symbols | 8 |
-| Flip | remove ink (lighten) |
 
-The decode check for this pair: the clean code and the printed boundary both read `kaveh.org`, flipping module `(9, 16)` reads `kaveh.o3g`, and the same flip on a stock code stays on `kaveh.org`.
+The decode check: the clean code and the printed boundary both read `kaveh.org`, flipping those two modules reads `kaveh.ong`, and the same two modules on a stock code stay on `kaveh.org`. Both ends are delegated TLDs, so the morph lands on a name an attacker can register.
 
-Neither `googlg.com` nor `kaveh.o3g` is claimed to be registered or to be a convincing look-alike. They are coding witnesses: the point is the one module, not the string. Which neighbours are actually registered is a question for the graph, and the live explorer answers it there.
+`googlg.com` is a coding witness, not a claim that the string is registered or confusable. `kaveh.ong` is different: it is a real TLD. That is the sharper result below.
+
+### Morphing between TLDs
+
+The same construction morphs same-length top-level domains into each other, with both ends real TLDs in the IANA root. A code for a host under one TLD becomes a host under another by adding or removing a few modules: `.ai` to `.am`, `.live` to `.life`, `.net` to `.new`, `.com` to `.cam`, each a small ink edit onto a registrable TLD. It reaches restricted namespaces too: `.net` to `.int`, or `.com` to `.gov`, real TLDs an attacker cannot own but can still point a scan at.
+
+This part is under coordinated disclosure. We are notifying the affected registry operators and ICANN SSAC before releasing the full map. The paper has the method and the measurement.
 
 ## How it works
 
