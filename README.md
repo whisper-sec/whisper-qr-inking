@@ -98,7 +98,7 @@ The decode check: the clean code and the printed boundary both read `kaveh.org`,
 
 The same construction morphs same-length top-level domains into each other, with both ends real TLDs in the IANA root. A code for a host under one TLD becomes a host under another by adding or removing a few modules: `.ai` to `.am`, `.live` to `.life`, `.net` to `.new`, `.com` to `.cam`, each a small ink edit onto a registrable TLD. It reaches restricted namespaces too: `.net` to `.int`, or `.com` to `.gov`, real TLDs an attacker cannot own but can still point a scan at.
 
-This part is under coordinated disclosure. We are notifying the affected registry operators and ICANN SSAC before releasing the full map. The paper has the method and the measurement.
+This is a coordinated disclosure: we are notifying the affected registry operators and ICANN SSAC. The paper has the method and the measurement.
 
 ## How it works
 
