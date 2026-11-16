@@ -4,9 +4,9 @@
 
 **A printed QR code that scans as one host and sits one square of ink away from another.**
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-14233E.svg)](LICENSE)
-[![Paper](https://img.shields.io/badge/paper-PDF-14406E.svg)](paper/qr-inking.pdf)
-[![Live demo](https://img.shields.io/badge/demo-lookalikes.whisper.security-3fe0cf.svg)](https://lookalikes.whisper.security/qr-inking)
+[![Code: MIT](https://img.shields.io/badge/code-MIT-14233E.svg)](LICENSE)
+[![Paper: CC BY 4.0](https://img.shields.io/badge/paper-CC%20BY%204.0-14406E.svg)](paper/qr-inking.pdf)
+[![Live demo](https://img.shields.io/badge/demo-qr--inking.whisper.security-3fe0cf.svg)](https://qr-inking.whisper.security)
 
 Kaveh Ranjbar, Whisper Security
 
@@ -39,7 +39,7 @@ This is a coding-theory result with a printing method attached. We are publishin
 
 ## The claim, stated carefully
 
-The honest version matters here, because the loose version ("a QR is one dot from a fake") is false and we do not want anyone repeating it.
+The precise version matters here, because the loose version ("a QR is one dot from a fake") is false and we do not want anyone repeating it.
 
 - **A clean QR code is safe.** Flip any single module on a code that came out of a normal generator and it still decodes to the original URL. The error correction absorbs it.
 - **The attack is a printed symbol, not a generated one.** It starts life already sitting on the decoding radius: it holds `t = floor(n_ec / 2)` preloaded symbol errors that all point at one neighbour `B`, and it decodes as the real host `A` anyway.
@@ -49,7 +49,7 @@ The honest version matters here, because the loose version ("a QR is one dot fro
 
 ## See it
 
-- **Live explorer:** [lookalikes.whisper.security/qr-inking](https://lookalikes.whisper.security/qr-inking). Type a URL, pick a version, level and polarity, and watch the boundary symbol, the ringed user module, and the decode flip, rendered in the browser.
+- **Live explorer:** [qr-inking.whisper.security](https://qr-inking.whisper.security). Paint a boundary symbol, watch the decode flip in the browser, and generate a safer QR for your own link.
 - **The paper:** [`paper/qr-inking.pdf`](paper/qr-inking.pdf). The construction, the validation, and the limits in full.
 
 ## Two worked examples
@@ -99,6 +99,10 @@ The decode check: the clean code and the printed boundary both read `kaveh.org`,
 The same construction morphs same-length top-level domains into each other, with both ends real TLDs in the IANA root. A code for a host under one TLD becomes a host under another by adding or removing a few modules: `.ai` to `.am`, `.live` to `.life`, `.net` to `.new`, `.com` to `.cam`, each a small ink edit onto a registrable TLD. It reaches restricted namespaces too: `.net` to `.int`, or `.com` to `.gov`, real TLDs an attacker cannot own but can still point a scan at.
 
 The full method and the measurement are in the paper.
+
+### Real-world targets
+
+The cost of a TLD morph depends only on the name length, so every brand of a given length inherits it, and the codes people scan most are printed payment and login codes. Alipay's merchant QR encodes `https://qr.alipay.com/<code>`; a single TLD edit, `com` to `cam`, turns it into `https://qr.alipay.cam/<code>`, decode-verified. The one-edit neighbour is already a registered domain: `alipay.cam` is held through Alibaba Cloud's own registrar (Dominet (HK) Limited). The one-edit neighbours of other payment and login hosts fall into three cases, each real today: open to register (`tenpay.cam` and `qq.cam` are unregistered), defensively held by the brand (`venmo.cam`, through PayPal's brand registrar), or held by a third party (`paypal.cam`). China and Southeast Asia, where printed QR is the default payment rail, are the high-stakes case. The paper has the full table, the registration status, and the damage per case.
 
 ## How it works
 
@@ -204,7 +208,7 @@ whisper-qr-inking/
 
 ## The paper
 
-[`paper/qr-inking.pdf`](paper/qr-inking.pdf), *Tattooing the Root Zone*, is the full write-up: the construction, the IANA-root TLD-morphing study, the validation (two decoders and a phone), the detection, and the limits. It is openly licensed under the same MIT terms as the code.
+[`paper/qr-inking.pdf`](paper/qr-inking.pdf), *Tattooing the Root Zone*, is the full write-up: the construction, the IANA-root TLD-morphing study, the validation (two decoders and a phone), the detection, and the limits. The paper is licensed CC BY 4.0; the reference code in this repository is MIT.
 
 ## Citation
 
@@ -221,10 +225,12 @@ whisper-qr-inking/
 
 ## License
 
-MIT. Copyright (c) 2026 Kaveh Ranjbar, Whisper Security. See [LICENSE](LICENSE). The knowledge and the code are free to use, with attribution.
+The reference code, the harness, and this repository are MIT (see [LICENSE](LICENSE)). The paper, `paper/qr-inking.pdf`, is licensed CC BY 4.0. Copyright (c) 2026 Kaveh Ranjbar, Whisper Security. The knowledge, the code, and the paper are free to use, with attribution.
 
 ## Prior work
 
 - M. Takita, H. Okuma, M. Morii. *A Construction of Fake QR Codes Based on Error-Correcting Codes.* CANDAR 2018, pp. 188-193.
 - T. Ohigashi, S. Kawaguchi, K. Kobayashi, et al. *Detecting Fake QR Codes Using Information from Error-Correction.* Journal of Information Processing, vol. 29, pp. 548-558, 2021.
+- K. Krombholz, P. Fruehwirt, P. Kieseberg, I. Kapsalis, M. Huber, E. Weippl. *QR Code Security: A Survey of Attacks and Challenges for Usable Security.* HAS 2014, LNCS 8533, pp. 79-90.
+- A. Dabrowski, K. Krombholz, J. Ullrich, E. Weippl. *QR Inception: Barcode-in-Barcode Attacks.* ACM SPSM 2014.
 - ISO/IEC 18004. Block structure, generator and placement, as implemented by segno 1.6.6.
