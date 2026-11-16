@@ -98,7 +98,7 @@ The decode check: the clean code and the printed boundary both read `kaveh.org`,
 
 The same construction morphs same-length top-level domains into each other, with both ends real TLDs in the IANA root. A code for a host under one TLD becomes a host under another by adding or removing a few modules: `.ai` to `.am`, `.live` to `.life`, `.net` to `.new`, `.com` to `.cam`, each a small ink edit onto a registrable TLD. It reaches restricted namespaces too: `.net` to `.int`, or `.com` to `.gov`, real TLDs an attacker cannot own but can still point a scan at.
 
-This is a coordinated disclosure: we are notifying the affected registry operators and ICANN SSAC. The paper has the method and the measurement.
+The full method and the measurement are in the paper.
 
 ## How it works
 
@@ -139,8 +139,13 @@ python3 src/qr_domain_flip.py https://google.com --polarity lighten --top 8
 # the ISO detection radius instead of floor(n_ec / 2)
 python3 src/qr_domain_flip.py https://google.com --version 2 --level L --iso --check
 
-# the full measurement sweep behind the paper's tables
+# the full host-edit measurement sweep behind the paper's tables
 python3 src/qr_sweep.py
+
+# the TLD-morphing study across the whole IANA root (the paper's core result)
+python3 tld_research.py --tlds data/tlds-alpha-by-domain.txt --out out/tld-research.json
+# one TLD morph end to end on the decoder: .net scans, add ink, now it scans .int
+python3 src/qr_domain_flip.py https://google.net --to https://google.int --version 2 --level M --check
 ```
 
 `--check` prints the four decoded strings. `--png-dir` writes the clean code, the boundary symbol with the user module in red, and the symbol after the flip.
@@ -150,7 +155,7 @@ python3 src/qr_sweep.py
 Every number the paper quotes is regenerated, not transcribed. The checks are:
 
 - **Renderer against segno.** The encoded matrix matches segno module-for-module, with zero difference, across versions 2-L, 2-M, 2-Q, 3-M, 4-M, 5-L and 6-M, on masks other than 0 as well, including multi-block versions where the blocks have unequal data length.
-- **Decode, four ways.** For each claimed pair the clean code, the printed boundary and the flipped symbol decode as expected, and the negative control (a stock code with the same module flipped) stays on the real host. This runs on OpenCV's current Aruco QR detector (version 5.0.0 family).
+- **Decode, four ways.** For each claimed pair the clean code, the printed boundary and the flipped symbol decode as expected, and the negative control (a stock code with the same module flipped) stays on the real host. Every decode runs on two independent decoders, OpenCV's current Aruco detector (5.0.0 family) and ZXing (zxing-cpp), which agree; the paper's examples were also flipped on a phone camera in the field.
 - **The one-module count.** The sweep over every single-character host edit reports how many are one module, how many of those land inside the hostname, and which versions fall back to two (the odd-`n_ec` cases, version 1-L and 3-L).
 
 ## Detecting it
@@ -181,10 +186,14 @@ If you find a real deployment of this in the wild, or you build on the detection
 whisper-qr-inking/
   README.md                  this file
   LICENSE                    MIT
-  requirements.txt           segno, numpy, pillow, opencv-python, fpdf2
+  requirements.txt           segno, numpy, pillow, opencv-python, zxing-cpp
   src/
     qr_domain_flip.py        reference implementation and CLI
-    qr_sweep.py              the measurement sweep behind the tables
+    qr_sweep.py              the host-edit measurement sweep
+  tld_research.py            the IANA-root TLD-morphing study
+  tld_morph.py               the TLD morph-cost sweep
+  data/
+    tlds-alpha-by-domain.txt the IANA root zone TLD list
   paper/
     qr-inking.pdf            the paper
   docs/
@@ -195,15 +204,16 @@ whisper-qr-inking/
 
 ## The paper
 
-[`paper/qr-inking.pdf`](paper/qr-inking.pdf) is the full write-up: the construction, the validation harness and its numbers, the per-version one-module frontier, the detection, and the limits. It is openly licensed under the same MIT terms as the code.
+[`paper/qr-inking.pdf`](paper/qr-inking.pdf), *Tattooing the Root Zone*, is the full write-up: the construction, the IANA-root TLD-morphing study, the validation (two decoders and a phone), the detection, and the limits. It is openly licensed under the same MIT terms as the code.
 
 ## Citation
 
 ```bibtex
 @techreport{ranjbar2026qrinking,
-  title       = {QR-Inking: One Directed Module Between Two Hosts},
+  title       = {Tattooing the Root Zone: QR-Inking and Same-Length TLD Morphing Across the IANA Root},
   author      = {Ranjbar, Kaveh},
   institution = {Whisper Security},
+  note        = {Preprint},
   year        = {2026},
   url         = {https://github.com/whisper-sec/whisper-qr-inking}
 }
